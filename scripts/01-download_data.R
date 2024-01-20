@@ -1,35 +1,20 @@
-# Load necessary libraries
-library(jsonlite)
-library(tibble)
-library(rjson)
+# Copy downloaded data to project folder
+source_file <- "C:/Users/chris/Downloads/Arrested and Charged Persons.csv"
+destination_file <- "inputs/data/unedited_data.csv"
 
-# Path to the locally saved JSON file
-local_json_file <- "C:/Users/chris/Downloads/toronto-beaches-observations.json"
+# Ensure the source file exists
+if (!file.exists(source_file)) {
+  stop("Source file does not exist:", source_file)
+}
 
-# Load the JSON data
-data_info <- fromJSON(local_json_file)
-resources <- data_info$result$resources
-
-# Find the CSV resource URL
-csv_url <- subset(resources, format == "CSV")$url
-
-# Download the CSV data
-beaches_data <- read.csv(url(csv_url))
-
-# Save the downloaded data
+# Ensure the 'inputs/data' directory exists
 if (!dir.exists("inputs/data")) {
   dir.create("inputs/data", recursive = TRUE)
 }
 
-write.csv(beaches_data, "inputs/data/unedited_data.csv", row.names = FALSE)
-
-# Commit changes to Git using the terminal
-cat('git add "scripts/01-download_data.R"\n', file = "commit_script.sh")
-cat('git add "inputs/data/unedited_data.csv"\n', file = "commit_script.sh", append = TRUE)
-cat('git commit -m "Download Toronto Beaches Observations data"\n', file = "commit_script.sh", append = TRUE)
-
-# Run the script in the terminal
-system("sh commit_script.sh")
-
-# Remove the temporary script file
-file.remove("commit_script.sh")
+# Copy the file
+if (!file.copy(source_file, destination_file, overwrite = TRUE)) {
+  stop("Failed to copy the file.")
+} else {
+  cat("File copied successfully to:", destination_file, "\n")
+}

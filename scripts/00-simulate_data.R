@@ -4,7 +4,6 @@ library(tibble)
 # Simulate additional data for testing
 set.seed(123)
 simulated_data <- tibble(
-  _id = numeric(5),  # Add _id column
   ARREST_YEAR = sample(2010:2022, 5, replace = TRUE),
   DIVISION = sample(c("D14", "D12", "D22"), 5, replace = TRUE),
   HOOD_158 = sample(1:200, 5, replace = TRUE),
@@ -18,7 +17,13 @@ simulated_data <- tibble(
 )
 
 # Combine with the actual data
-actual_data <- read.csv("C:/Users/chris/Downloads/Arrested and Charged Persons.csv")  
+actual_data <- read.csv("C:/Users/chris/Downloads/Arrested and Charged Persons.csv")
+
+# Exclude the '_id' column if present
+if ("X_id" %in% names(actual_data)) {
+  actual_data <- actual_data[, -which(names(actual_data) == "X_id")]
+}
+
 # Make sure the simulated data has the same columns as the actual data
 simulated_data <- simulated_data[, names(actual_data)]
 
@@ -27,7 +32,11 @@ simulated_and_actual_data <- rbind(actual_data, simulated_data)
 
 # Develop some tests (e.g., summary statistics, plots)
 summary(simulated_and_actual_data)
-# Add more tests as needed
+
+# Ensure 'outputs' directory exists
+if (!dir.exists("outputs")) {
+  dir.create("outputs")
+}
 
 # Save simulated data to a CSV file
 write.csv(simulated_and_actual_data, "outputs/simulated_and_actual_data.csv", row.names = FALSE)
