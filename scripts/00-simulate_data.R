@@ -1,44 +1,33 @@
-# Load necessary libraries
+# Load required libraries
 library(tibble)
 
-# Create directories if they don't exist
-if (!file.exists("inputs/data")) {
-  dir.create("inputs/data", recursive = TRUE)
-}
-
-# Simulate Toronto Beaches Observations dataset
-set.seed(123)  
-
-# Generate simulated data
+# Simulate additional data for testing
+set.seed(123)
 simulated_data <- tibble(
-  dataCollectionDate = seq(as.Date("2010-08-03"), as.Date("2010-08-04"), by = "1 day"),
-  beachName = c("Marie Curtis Park East Beach", "Sunnyside Beach"),
-  wind_speed = c(5, 5),
-  windDirection = c("SW", "SW"),
-  airTemp = c(31, 31),
-  rain = c("Yes", "Yes"),
-  rainAmount = c(NA, NA),  # Replace with appropriate values
-  waterTemp = c(22.6, 21.9),
-  waterFowl = c(12, 30),
-  waveAction = c("LOW", "LOW"),
-  waterClarity = c("Clear", "Clear"),
-  turbidity = c(0.9, 0.6)
+  _id = numeric(5),  # Add _id column
+  ARREST_YEAR = sample(2010:2022, 5, replace = TRUE),
+  DIVISION = sample(c("D14", "D12", "D22"), 5, replace = TRUE),
+  HOOD_158 = sample(1:200, 5, replace = TRUE),
+  NEIGHBOURHOOD_158 = sample(c("NeighA", "NeighB", "NeighC"), 5, replace = TRUE),
+  SEX = sample(c("Male", "Female"), 5, replace = TRUE),
+  AGE_COHORT = sample(c("<18", "18 to 24", "25 to 34"), 5, replace = TRUE),
+  AGE_GROUP = sample(c("Youth", "Adult"), 5, replace = TRUE),
+  CATEGORY = sample(c("Crimes Against the Person", "Controlled Drugs and Substances Act"), 5, replace = TRUE),
+  SUBTYPE = sample(c("Assaults", "Other"), 5, replace = TRUE),
+  ARREST_COUNT = sample(1:5, 5, replace = TRUE)
 )
 
-# Save simulated data
-write.csv(simulated_data, "inputs/data/unedited_data.csv", row.names = FALSE)
+# Combine with the actual data
+actual_data <- read.csv("C:/Users/chris/Downloads/Arrested and Charged Persons.csv")  
+# Make sure the simulated data has the same columns as the actual data
+simulated_data <- simulated_data[, names(actual_data)]
 
-# Perform some tests on the simulated data
-mean_air_temp <- mean(simulated_data$airTemp)
-cat("Mean Air Temperature:", mean_air_temp, "\n")
+# Combine the data
+simulated_and_actual_data <- rbind(actual_data, simulated_data)
 
-# Commit changes to Git using the terminal
-cat('git add "scripts/00-simulate_data.R"\n', file = "commit_script.sh")
-cat('git add "inputs/data/unedited_data.csv"\n', file = "commit_script.sh", append = TRUE)
-cat('git commit -m "Simulate Toronto Beaches Observations data"\n', file = "commit_script.sh", append = TRUE)
+# Develop some tests (e.g., summary statistics, plots)
+summary(simulated_and_actual_data)
+# Add more tests as needed
 
-# Run the script in the terminal
-system("sh commit_script.sh")
-
-# Remove the temporary script file
-file.remove("commit_script.sh")
+# Save simulated data to a CSV file
+write.csv(simulated_and_actual_data, "outputs/simulated_and_actual_data.csv", row.names = FALSE)
